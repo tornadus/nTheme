@@ -4,7 +4,10 @@ A modern theme manager for TI-Nspire calculators running ndless
 
 Alpha release, currently only supports the CX II-T on 6.4.0.74 with ndless r2022 or later
 
-_Screenshots Here_
+| Themed Home            | Settings               | Dark Mode               |
+| ---------------------- | ---------------------- | ---------------------- |
+| ![home](screenshots/home.png) | ![settings](screenshots/settings.png) | ![dark](screenshots/dark_scratchpad.png) |
+
 
 ## Features
 
@@ -25,7 +28,7 @@ Note: Transfer `nTheme.tns` to `ndless/startup` if you'd like it to install itse
 
 ### Wallpaper support
 
-Put PNG or JPEG files into `ndless/wallpapers/`. The file name must end in `.tns`, for example `wallpaper.png.tns`. Pictures up to 4 megapixels can be decoded, and the home screen area is 320x217 pixels.
+Put PNG or JPEG files into `ndless/wallpapers/`. The file name must end in `.tns`, for example `wallpaper.png.tns`. Pictures up to 2 megapixels are guaranteed to be decoded, with mixed results between 2-4 MP. The home screen area is 320x217 pixels.
 
 Tips: Try to keep images small and crop to ~3:2 for best results
 
@@ -35,7 +38,7 @@ Dark mode isn't perfect. There may be bugs, including unreadable UI elements or 
 
 ## Please add support for [insert CX variant here] on [insert OS here]!!!
 
-Take a snapshot (RAM state) of your variant and OS version under firebird while on the home screen, then run `utils/hookfinder.py` against it.
+Take a snapshot (RAM state) of your variant and OS version under firebird with ndless installed while on the home screen, then run `utils/hookfinder.py` against it.
 After that, open a GitHub issue with the .txt file it spits out, and I'll see what I can do from there.
 
 ## Build
