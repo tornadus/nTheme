@@ -21,7 +21,7 @@ _Screenshots Here_
 2. Run the program, the settings dialog will open automatically
 3. To edit settings again, look under Home > 5 > Style
 
-Note: Transfer `nTheme.tns` to `ndless/startup` if you'd like it to install itself alongside ndless automatically
+Note: Transfer `nTheme.tns` to `ndless/startup` if you'd like it to install itself alongside ndless automatically. Started that way, the wallpaper is decoded the first time the home screen is drawn after the install (memory is too constrained to decode it any earlier); if that fails, the reason is shown the next time you open Home > 5 > Style.
 
 ### Wallpaper support
 

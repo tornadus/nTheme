@@ -18,6 +18,9 @@ static struct config current;
 
 static void open_settings(void)
 {
+	const char *deferred = wallpaper_take_deferred_error();
+	if (deferred)
+		report_error("The wallpaper was not loaded when nTheme started. %s", deferred);
 	struct config edited = current;
 	switch (settings_run(&edited)) {
 	case SETTINGS_FAILED:
@@ -31,7 +34,7 @@ static void open_settings(void)
 	current = edited;
 	if (!config_save(&current))
 		report_error("%s: could not write.", config_path());
-	apply_config(&current, os);
+	apply_config(&current, os, false);
 }
 
 /* nl_osid is an extension syscall; nl_hassyscall() cannot see those, so gate on the revision. */
@@ -97,7 +100,8 @@ int main(void)
 	patch_install(os);
 	wallpaper_create_folder();
 	load_config();
-	apply_config(&current, os);
+	/* Memory is tight while startup programs run: decode the wallpaper later. */
+	apply_config(&current, os, nl_isstartup());
 	if (!nl_isstartup()) {
 		open_settings();
 		report_info("nTheme stays active until the next reboot. Copy nTheme.tns into ndless/startup to run it with every Ndless install.");

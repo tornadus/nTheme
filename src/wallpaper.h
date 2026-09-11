@@ -20,11 +20,16 @@ void wallpaper_create_folder(void);
 /* Sorted *.tns names in the folder. Returns the count. */
 int wallpaper_list(char names[][WALLPAPER_NAME_MAX], int max);
 
-/* Replace the current image. Off or a missing file simply means no wallpaper; false = a real failure, see `error`. */
-bool wallpaper_apply(bool on, const char *file, enum image_scale scale, unsigned background_rgb,
+/* Replace the current image. Off or a missing file simply means no wallpaper; false = a real failure, see `error`.
+ * With `defer` the decode waits for the first home screen paint instead: memory is too constrained while startup
+ * programs run (only a few MB free), and a deferred failure is kept for wallpaper_take_deferred_error(). */
+bool wallpaper_apply(bool on, const char *file, enum image_scale scale, unsigned background_rgb, bool defer,
                      char *error, int error_capacity);
 
-/* Hook side: TI.Image to draw, or NULL. */
+/* The reason a deferred decode failed, once; NULL when there is none (yet). */
+const char *wallpaper_take_deferred_error(void);
+
+/* Hook side: TI.Image to draw, or NULL. Runs a deferred decode on first use. */
 const void *wallpaper_image(void);
 
 #endif

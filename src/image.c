@@ -24,7 +24,7 @@ static const char *basename_of(const char *path)
 	return slash ? slash + 1 : path;
 }
 
-static unsigned char *read_file(const char *path, long *size, char *error, int capacity)
+static unsigned char *read_file(const char *path, long *size, bool *no_memory, char *error, int capacity)
 {
 	FILE *file = fopen(path, "rb");
 	if (!file) {
@@ -36,7 +36,8 @@ static unsigned char *read_file(const char *path, long *size, char *error, int c
 	fseek(file, 0, SEEK_SET);
 	unsigned char *data = *size > 0 ? malloc(*size) : NULL;
 	if (!data || fread(data, 1, *size, file) != (size_t)*size) {
-		snprintf(error, capacity, "%s: cannot read (%s)", basename_of(path), data ? "short read" : "out of memory");
+		*no_memory = !data && *size > 0;
+		snprintf(error, capacity, "%s: cannot read (%s)", basename_of(path), *no_memory ? "out of memory" : "short read");
 		free(data);
 		fclose(file);
 		return NULL;
@@ -45,8 +46,19 @@ static unsigned char *read_file(const char *path, long *size, char *error, int c
 	return data;
 }
 
+/* stb decodes into a buffer the size of the raw pixels and builds the final image beside it. Its first
+ * malloc failure returns NULL without a reason, so check up front instead of blaming the file. */
+static bool decode_memory_available(unsigned width, unsigned height)
+{
+	size_t need = (size_t)width * height * CHANNELS + height + 4096;
+	void *raw = malloc(need), *image = malloc(need);
+	free(raw);
+	free(image);
+	return raw && image;
+}
+
 static bool decode(const unsigned char *data, long size, unsigned max_pixels, const char *name,
-                   struct rgb_bitmap *bitmap, char *error, int capacity)
+                   struct rgb_bitmap *bitmap, bool *no_memory, char *error, int capacity)
 {
 	int width, height, channels;
 	if (!stbi_info_from_memory(data, size, &width, &height, &channels)) {
@@ -57,9 +69,15 @@ static bool decode(const unsigned char *data, long size, unsigned max_pixels, co
 		snprintf(error, capacity, "%s: %dx%d is over the %u megapixel limit", name, width, height, max_pixels / 1000000);
 		return false;
 	}
-	bitmap->pixels = stbi_load_from_memory(data, size, &width, &height, &channels, CHANNELS);
+	bitmap->pixels = decode_memory_available(width, height)
+	                 ? stbi_load_from_memory(data, size, &width, &height, &channels, CHANNELS) : NULL;
 	if (!bitmap->pixels) {
-		snprintf(error, capacity, "%s: decoding failed (%s)", name, stbi_failure_reason());
+		*no_memory = !decode_memory_available(width, height);
+		if (*no_memory)
+			snprintf(error, capacity, "%s: not enough free memory to decode %dx%d (about %u MB)",
+			         name, width, height, (unsigned)((2 * (size_t)width * height * CHANNELS + size) >> 20) + 1);
+		else
+			snprintf(error, capacity, "%s: decoding failed (%s)", name, stbi_failure_reason());
 		return false;
 	}
 	bitmap->width = width;
@@ -147,21 +165,25 @@ static struct ti_image *compose(const struct rgb_bitmap *source, unsigned width,
 }
 
 struct ti_image *image_load(const char *path, unsigned width, unsigned height, enum image_scale scale,
-                            unsigned background_rgb, unsigned max_pixels, char *error, int error_capacity)
+                            unsigned background_rgb, unsigned max_pixels, bool *no_memory,
+                            char *error, int error_capacity)
 {
+	*no_memory = false;
 	long size;
-	unsigned char *data = read_file(path, &size, error, error_capacity);
+	unsigned char *data = read_file(path, &size, no_memory, error, error_capacity);
 	if (!data)
 		return NULL;
 	struct rgb_bitmap bitmap;
-	bool decoded = decode(data, size, max_pixels, basename_of(path), &bitmap, error, error_capacity);
+	bool decoded = decode(data, size, max_pixels, basename_of(path), &bitmap, no_memory, error, error_capacity);
 	free(data);
 	if (!decoded)
 		return NULL;
 	struct ti_image *image = compose(&bitmap, width, height, scale, background_rgb);
 	stbi_image_free(bitmap.pixels);
-	if (!image)
+	if (!image) {
+		*no_memory = true;
 		snprintf(error, error_capacity, "%s: out of memory", basename_of(path));
+	}
 	return image;
 }
 
