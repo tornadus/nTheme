@@ -1,0 +1,6 @@
+build/
+*.elf
+*.tns
+*.zehn
+__pycache__/
+.DS_Store
