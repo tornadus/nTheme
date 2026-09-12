@@ -2,12 +2,17 @@
 
 A modern theme manager for TI-Nspire calculators running ndless
 
-Alpha release, currently only supports the CX II-T on 6.4.0.74 with ndless r2022 or later
+Alpha release, see below for specific model support information.
 
 | Themed Home            | Settings               | Dark Mode               |
 | ---------------------- | ---------------------- | ---------------------- |
 | ![home](screenshots/home.png) | ![settings](screenshots/settings.png) | ![dark](screenshots/dark_scratchpad.png) |
 
+
+## Supported Calculators
+Note: OS is assumed to be 6.4.0.74 ndless version is assumed to be r2022
+- TI-Nspire CX II
+- TI-Nspire CX II-T
 
 ## Features
 

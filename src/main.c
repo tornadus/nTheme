@@ -49,7 +49,7 @@ static const struct os_table *supported_os(void)
 	unsigned osid = nl_osid();
 	const struct os_table *table = os_table_lookup(osid);
 	if (!table) {
-		report_error("Unsupported calculator or OS (Ndless OS index %u). This build supports the CX II-T on OS 6.4.0.74.", osid);
+		report_error("Unsupported calculator or OS (Ndless OS index %u).", osid);
 		return NULL;
 	}
 	if (nl_hwsubtype() != table->hardware_subtype

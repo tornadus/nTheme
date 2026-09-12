@@ -2,17 +2,56 @@
 #include <stddef.h>
 #include "hooks.h"
 
-/* Dark mode keeps: title bars (3, 5, 133..135), doc browser bars (87, 223, 226, 231), white text on the accent. */
-static const unsigned short keep_6_4_cx2t[] = {
+/* OS 6.4 color table facts, identical on every CX II variant (same 454 names and stock values).
+   Dark mode keeps: title bars (3, 5, 133..135), doc browser bars (87, 223, 226, 231), white text on the accent. */
+static const unsigned short keep_6_4[] = {
 	3, 5, 133, 134, 135, 87, 223, 226, 231,
 	64, 86, 88, 124, 185, 191, 221, 238, 298, 328, 345, 361
 };
-static const unsigned short dim_6_4_cx2t[] = { 127, 129, 147, 375 };
-static const unsigned short accent_text_6_4_cx2t[] = {
+static const unsigned short dim_6_4[] = { 127, 129, 147, 375 };
+static const unsigned short accent_text_6_4[] = {
 	104, 64, 86, 88, 124, 185, 191, 221, 238, 298, 328, 345, 361
 };
 
 static const struct os_table tables[] = {
+	{
+		.osid = 47, .hardware_subtype = 2,
+		.fingerprint_address = 0x10000020, .fingerprint = 0x10429ec0,
+		.model = "CX II", .os_version = "6.4.0.74",
+		.color_table = 0x10b1b8a8, .color_count = 454,
+		.editor_config = { 0x10b4eaf8, 0x10b4ec04, 0x10b4ed10 },
+		.plot_palette = 0x10b13360,
+		.menu_literal = 0x109d9c68, .menu_base = 0x10bdc654, .menu_context_count = 9,
+		.menu_label_string = 0x3ef, /* "Style" */
+		.event_enter = 0x14c0b, .event_click = 0x14c0d,
+		.set_color_driver = { 0x100290b4, 0xE92D4038, 0xE590C030 }, /* push {r3,r4,r5,lr}; ldr ip,[r0,#0x30] */
+		.set_color_wrapper_return = 0x1004d0fc,
+		.home_background = { 0x10315314, 0xE3A0C004, 0xE1A00004 },  /* mov ip,#4; mov r0,r4 */
+		.home_title = { 0x103152dc, 0xE280300B, 0xE1A00004 },       /* add r3,r0,#0xb; mov r0,r4 */
+		.home_title_font = 0x10b,
+		.os_code_begin = 0x10000000, .os_code_end = 0x10C00000,
+		.ids = {
+			.home_background = 99, .home_section_title = 101,
+			.home_list_background = 103, .home_list_text = 105,
+			.home_doc_name_background = 109, .home_doc_name_text = 110,
+			.keep_first = 94, .keep_last = 110,
+			.keep = keep_6_4, .keep_count = sizeof keep_6_4 / sizeof keep_6_4[0],
+			.dim = dim_6_4, .dim_count = sizeof dim_6_4 / sizeof dim_6_4[0],
+			.accent_text = accent_text_6_4,
+			.accent_text_count = sizeof accent_text_6_4 / sizeof accent_text_6_4[0],
+			.stock_accent = 0x2478CF, .plot_grid_index = 9,
+		},
+		.dialog = {
+			.dialog_new = 0x1025e100, .dialog_content = 0x1025e040,
+			.panel_new = 0x1025e03c, .set_layout = 0x1025e1e4,
+			.add_label = 0x1025e0fc, .add_combo = 0x1025e150, .add_checkbox = 0x1025e190,
+			.pair_components = 0x1025e224, .add_button = 0x10070390,
+			.set_default_button = 0x1025e208, .set_escape_button = 0x1025e1f8,
+			.run_or_close = 0x1025e1dc, .component_dialog = 0x1025e118, .dialog_delete = 0x1025e228,
+			.combo_get = 0x1025e1cc, .combo_set = 0x1025e218,
+			.checkbox_get = 0x1025e234, .checkbox_set = 0x1025df78,
+		},
+	},
 	{
 		.osid = 48, .hardware_subtype = 2,
 		.fingerprint_address = 0x10000020, .fingerprint = 0x1042a600,
@@ -34,10 +73,10 @@ static const struct os_table tables[] = {
 			.home_list_background = 103, .home_list_text = 105,
 			.home_doc_name_background = 109, .home_doc_name_text = 110,
 			.keep_first = 94, .keep_last = 110,
-			.keep = keep_6_4_cx2t, .keep_count = sizeof keep_6_4_cx2t / sizeof keep_6_4_cx2t[0],
-			.dim = dim_6_4_cx2t, .dim_count = sizeof dim_6_4_cx2t / sizeof dim_6_4_cx2t[0],
-			.accent_text = accent_text_6_4_cx2t,
-			.accent_text_count = sizeof accent_text_6_4_cx2t / sizeof accent_text_6_4_cx2t[0],
+			.keep = keep_6_4, .keep_count = sizeof keep_6_4 / sizeof keep_6_4[0],
+			.dim = dim_6_4, .dim_count = sizeof dim_6_4 / sizeof dim_6_4[0],
+			.accent_text = accent_text_6_4,
+			.accent_text_count = sizeof accent_text_6_4 / sizeof accent_text_6_4[0],
 			.stock_accent = 0x2478CF, .plot_grid_index = 9,
 		},
 		.dialog = {
